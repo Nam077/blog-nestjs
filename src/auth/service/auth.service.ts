@@ -4,6 +4,7 @@ import { UserService } from 'src/user/service/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/model/user.interface';
 import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -47,5 +48,17 @@ export class AuthService {
     login(loginDto: LoginDto): Observable<User> {
         //return user from validateUser
         return this.validateUser(loginDto);
+    }
+    register(registerDto: RegisterDto): Observable<User> {
+        return this.hashPassword(registerDto.password).pipe(
+            switchMap((hash) => {
+                return this.userService.create({
+                    username: registerDto.username,
+                    password: hash,
+                    email: registerDto.email,
+                    name: registerDto.name,
+                });
+            }),
+        );
     }
 }
